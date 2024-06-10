@@ -29,7 +29,7 @@ const Rebrand = () => {
         throw new Error('Invalid URL');
       }
 
-      const response = await fetch('http://localhost:5000/api/rebrand', {
+      const response = await fetch('http://localhost:5001/api/rebrand', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ const Rebrand = () => {
       console.log('Rebranded URL data saved:', data);
 
       // Update the input box with the full rebranded URL
-      setRebrandedUrl(`http://localhost:5000${data.path}`);
+      setRebrandedUrl(`http://localhost:5001${data.path}`);
       setRebrandedData(null); // Clear any previously fetched data
     } catch (error) {
       console.error('Error rebranding URL:', error);

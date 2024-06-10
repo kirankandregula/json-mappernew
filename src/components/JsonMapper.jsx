@@ -192,7 +192,7 @@ const JsonMapper = () => {
   const saveUpdatedJson = () => {
     const jsonData = updatedSourceJson ? JSON.parse(updatedSourceJson) : {};
 
-    fetch('http://localhost:5000/api/save', {
+    fetch('http://localhost:5001/api/save', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
