@@ -3,6 +3,8 @@ import { JsonEditor as Editor } from "jsoneditor-react";
 import "jsoneditor-react/es/editor.min.css";
 import JsonContext from "./JsonContext";
 import { useNavigate } from "react-router-dom";
+import { Alert, AlertTitle } from "@mui/material";
+import WarningIcon from "@mui/icons-material/Warning";
 
 const SchemaBuilder = () => {
   const { sourceJson, setSourceJson, setTargetJson } = useContext(JsonContext);
@@ -16,7 +18,7 @@ const SchemaBuilder = () => {
       const newObj = { ...obj };
       for (const key in newObj) {
         if (Array.isArray(newObj[key]) && newObj[key].length > 0) {
-          if (typeof newObj[key][0] === 'object') {
+          if (typeof newObj[key][0] === "object") {
             // If the value is an array of objects, take only the 0th index
             newObj[key] = [newObj[key][0]];
           }
@@ -30,14 +32,16 @@ const SchemaBuilder = () => {
       if (Array.isArray(json)) {
         if (json.length > 0 && Array.isArray(json[0])) {
           // If the first item is an array, take the 0th index of each nested array
-          return json.map(subArray => {
+          return json.map((subArray) => {
             const normalizedSubArray = extractZeroIndexObject(subArray);
-            return Object.keys(normalizedSubArray).length > 0 ? normalizedSubArray : {};
+            return Object.keys(normalizedSubArray).length > 0
+              ? normalizedSubArray
+              : {};
           });
         } else {
           return json.length > 0 ? extractZeroIndexObject(json[0]) : {};
         }
-      } else if (json && typeof json === 'object') {
+      } else if (json && typeof json === "object") {
         return extractZeroIndexObject(json);
       }
       return {};
@@ -58,10 +62,13 @@ const SchemaBuilder = () => {
       if (key in obj) {
         if (Array.isArray(template[key]) && Array.isArray(obj[key])) {
           // Handle arrays of objects
-          updatedObj[key] = obj[key].map(item =>
+          updatedObj[key] = obj[key].map((item) =>
             updateObject(template[key][0], item)
           );
-        } else if (typeof template[key] === 'object' && !Array.isArray(template[key])) {
+        } else if (
+          typeof template[key] === "object" &&
+          !Array.isArray(template[key])
+        ) {
           updatedObj[key] = updateObject(template[key], obj[key]);
         } else {
           updatedObj[key] = obj[key];
@@ -74,7 +81,7 @@ const SchemaBuilder = () => {
   const applyDeletionsToSourceJson = () => {
     const template = editorValue;
     const updatedSourceJson = Array.isArray(sourceJson)
-      ? sourceJson.map(obj => updateObject(template, obj))
+      ? sourceJson.map((obj) => updateObject(template, obj))
       : updateObject(template, sourceJson);
 
     setSourceJson(updatedSourceJson);
@@ -85,14 +92,38 @@ const SchemaBuilder = () => {
   const handleTargetButtonClick = () => {
     setTargetJson(editorValue);
     alert("Data saved in target");
-    navigate('/json-mapper');
+    navigate("/json-mapper");
   };
 
   return (
     <div className="container mt-3">
       <div className="row">
         <div className="col">
-          <h3 className="text-warning">Schema Builder:</h3>
+          <div className="d-flex align-items-center ">
+            <h4 className="text-danger" style={{ display: "inline" }}>
+              Schema Builder:
+            </h4>
+            {currentStep === 1 && (
+              <div className="text-center  d-flex flex-row  align-items-center justify-content-center" style={{width: '600px'}}>
+                <Alert
+                  severity="warning"
+                  icon={<WarningIcon />}
+                  className="ms-3 "
+                >
+                  <AlertTitle  style={{ fontWeight: 'bold' }}>
+                    Please Remove the Fields that are not required
+                  </AlertTitle>
+                </Alert>
+              </div>
+            )}
+            {currentStep === 2 && (
+               <div className="text-center  d-flex flex-row  align-items-center justify-content-center" style={{width: '600px'}}>
+              <Alert severity="warning" icon={<WarningIcon />} className="ms-3">
+                <AlertTitle  style={{ fontWeight: 'bold' }}>Update fields to TargetJson</AlertTitle>
+              </Alert>
+              </div>
+            )}
+          </div>
           {currentStep === 1 && (
             <>
               {Object.keys(editorValue).length > 0 ? (
@@ -108,7 +139,10 @@ const SchemaBuilder = () => {
               ) : (
                 <p>No source JSON available</p>
               )}
-              <button className="btn btn-primary my-2" onClick={applyDeletionsToSourceJson}>
+              <button
+                className="btn btn-primary my-2"
+                onClick={applyDeletionsToSourceJson}
+              >
                 Update Source JSON
               </button>
             </>

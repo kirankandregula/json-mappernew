@@ -30,3 +30,6 @@
   z-index: -1;
 }
 
+.inline{
+  display: "inline";
+}
